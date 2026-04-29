@@ -1,23 +1,22 @@
-//  Express server with security, CORS, rate-limiting, routes.
-
+// Express server with security, CORS, rate-limiting, routes.
 
 require('dotenv').config();
 
-const express     = require('express');
-const helmet      = require('helmet');
-const cors        = require('cors');
-const morgan      = require('morgan');
-const rateLimit   = require('express-rate-limit');
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
-const authRoutes  = require('./routes/auth');
-const taskRoutes  = require('./routes/tasks');
+const authRoutes = require('./routes/auth');
+const taskRoutes = require('./routes/tasks');
 const errorHandler = require('./middleware/errorHandler');
 
 // Initialise DB (runs CREATE TABLE IF NOT EXISTS on first boot)
 require('./models/db');
 
-const app  = express();
-const PORT = process.env.PORT || 5000;
+const app = express();
+const PORT = process.env.PORT || 5000;   
 
 // Security headers 
 app.use(helmet());
@@ -65,7 +64,7 @@ const authLimiter = rateLimit({
 
 app.use(globalLimiter);
 
-//Health check
+// Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -76,10 +75,10 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api/auth',  authLimiter, authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/tasks', taskRoutes);
 
-//  404 handler
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.method} ${req.path} not found.` });
 });
@@ -87,11 +86,11 @@ app.use((req, res) => {
 // Centralised error handler (must be last)
 app.use(errorHandler);
 
-//Start server
+// Start server
 app.listen(PORT, () => {
-  console.log(`\n🚀  TaskFlow API running on http://localhost:${PORT}`);
-  console.log(`📦  Environment : ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔑  JWT expires : ${process.env.JWT_EXPIRES_IN || '7d'}\n`);
+  console.log(`\n🚀 TaskFlow API running on http://localhost:${PORT}`);
+  console.log(`📦 Environment : ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔑 JWT expires : ${process.env.JWT_EXPIRES_IN || '7d'}\n`);
 });
 
 module.exports = app;
